@@ -1,0 +1,61 @@
+// Tier 0 index/cache. Rebuildable from Hedera mirror node + on-disk passport JSON.
+// Never write to this DB without a corresponding on-chain write. On-chain is truth.
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Passport {
+  id                    String   @id @default(cuid())
+  tokenId               String
+  serialNumber          Int
+  gtinStub              String
+  ownerAccountId        String
+  manufacturerAccountId String
+  currentContentHash    String
+  passportJsonPath      String
+  mintTxId              String   @unique
+  createdAt             DateTime @default(now())
+
+  events   Event[]
+  listings Listing[]
+
+  @@unique([tokenId, serialNumber])
+  @@index([tokenId])
+}
+
+model Event {
+  id                    String   @id @default(cuid())
+  passportId            String
+  type                  String
+  actorAccountId        String
+  payloadHash           String
+  hcsSequenceNumber     Int
+  hcsConsensusTimestamp String
+  evidenceUri           String?
+  evmTxHash             String?  @unique
+  createdAt             DateTime @default(now())
+
+  passport Passport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+
+  @@index([passportId, createdAt])
+}
+
+model Listing {
+  id                   String   @id @default(cuid())
+  passportId           String
+  priceTinybars        BigInt
+  sellerAccountId      String
+  status               String
+  marketplaceListingId String   @unique
+  createdAt            DateTime @default(now())
+
+  passport Passport @relation(fields: [passportId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
