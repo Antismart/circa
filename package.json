@@ -4,8 +4,9 @@
   "private": true,
   "description": "circa — Digital Product Passport on Hedera",
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "next dev",
-    "prebuild": "hardhat compile",
+    "prebuild": "prisma generate && hardhat compile",
     "build": "next build",
     "predev": "hardhat compile --quiet",
     "start": "next start",
