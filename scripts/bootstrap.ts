@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync } from "node:fs";
 import { join } from "node:path";
 import {
   AccountBalanceQuery,
@@ -78,7 +78,7 @@ function writeEnvAtomic(updates: Record<string, string>): void {
 
   const tmp = `${ENV_PATH}.tmp`;
   writeFileSync(tmp, out.join("\n"));
-  writeFileSync(ENV_PATH, readFileSync(tmp));
+  renameSync(tmp, ENV_PATH);
 }
 
 async function ensureOperatorFunded(): Promise<void> {
