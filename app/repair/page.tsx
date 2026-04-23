@@ -1,10 +1,34 @@
-import { RepairForm } from "./RepairForm";
+import { RepairForm, type PassportOption } from "./RepairForm";
 import { getRoleFromCookie } from "@/lib/role";
+import { prisma } from "@/lib/db";
+import { loadPassport } from "@/lib/passport";
 
 export const dynamic = "force-dynamic";
 
+async function listPassportOptions(): Promise<PassportOption[]> {
+  const rows = await prisma.passport.findMany({
+    orderBy: { createdAt: "asc" },
+  });
+  const options: PassportOption[] = [];
+  for (const row of rows) {
+    const passport = loadPassport(row.tokenId, row.serialNumber);
+    if (!passport) continue;
+    options.push({
+      value: `${row.tokenId}-${row.serialNumber}`,
+      label: passport.name,
+      serial: String(row.serialNumber).padStart(3, "0"),
+      manufacturer: passport.manufacturer.name,
+    });
+  }
+  return options;
+}
+
 export default async function RepairPage() {
-  const role = await getRoleFromCookie();
+  const [role, passports] = await Promise.all([
+    getRoleFromCookie(),
+    listPassportOptions(),
+  ]);
+
   return (
     <div className="rise">
       <div className="mb-12 max-w-2xl">
@@ -37,7 +61,7 @@ export default async function RepairPage() {
         </div>
       )}
 
-      <RepairForm />
+      <RepairForm passports={passports} />
     </div>
   );
 }

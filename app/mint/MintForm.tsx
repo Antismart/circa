@@ -2,8 +2,48 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Field, TextInput, Textarea } from "../_components/Field";
+import { Field, TextInput, Textarea, Select, Combobox } from "../_components/Field";
 import { Stamp } from "../_components/Stamp";
+
+const COUNTRY_OPTIONS = [
+  { value: "DE", label: "Germany" },
+  { value: "NL", label: "Netherlands" },
+  { value: "SE", label: "Sweden" },
+  { value: "DK", label: "Denmark" },
+  { value: "NO", label: "Norway" },
+  { value: "FI", label: "Finland" },
+  { value: "FR", label: "France" },
+  { value: "IT", label: "Italy" },
+  { value: "ES", label: "Spain" },
+  { value: "PT", label: "Portugal" },
+  { value: "AT", label: "Austria" },
+  { value: "BE", label: "Belgium" },
+  { value: "IE", label: "Ireland" },
+  { value: "CH", label: "Switzerland" },
+  { value: "GB", label: "United Kingdom" },
+  { value: "US", label: "United States" },
+  { value: "CA", label: "Canada" },
+  { value: "JP", label: "Japan" },
+];
+
+const CATEGORY_SUGGESTIONS = [
+  "kitchen-appliance/espresso-machine",
+  "kitchen-appliance/coffee-grinder",
+  "kitchen-appliance/kettle",
+  "kitchen-appliance/toaster",
+  "kitchen-appliance/refrigerator",
+  "mobility/e-bike",
+  "mobility/scooter",
+  "mobility/skateboard",
+  "furniture/office-chair",
+  "furniture/desk",
+  "furniture/lamp",
+  "electronics/laptop",
+  "electronics/phone",
+  "electronics/headphones",
+  "apparel/shoes",
+  "apparel/jacket",
+];
 
 const DEFAULT_MATERIALS = `[
   { "material": "steel-304",   "mass_g": 4200, "recycledPercent": 42 },
@@ -44,8 +84,11 @@ export function MintForm() {
   });
 
   function update<K extends keyof typeof form>(key: K) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setForm((f) => ({ ...f, [key]: e.target.value }));
+    return (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >
+    ) => setForm((f) => ({ ...f, [key]: e.target.value }));
   }
 
   async function submit(e: React.FormEvent) {
@@ -177,8 +220,14 @@ export function MintForm() {
             <TextInput value={form.name} onChange={update("name")} required />
           </Field>
         </div>
-        <Field label="Category" number="2." hint="taxonomy / subtype">
-          <TextInput value={form.category} onChange={update("category")} required />
+        <Field label="Category" number="2." hint="pick or type your own">
+          <Combobox
+            listId="mint-category-options"
+            value={form.category}
+            onChange={update("category")}
+            suggestions={CATEGORY_SUGGESTIONS}
+            required
+          />
         </Field>
         <Field label="Date of manufacture" number="3.">
           <TextInput
@@ -201,11 +250,11 @@ export function MintForm() {
             />
           </Field>
         </div>
-        <Field label="Country" number="5." hint="ISO 3166-1 alpha-2">
-          <TextInput
+        <Field label="Country" number="5." hint="country of manufacture">
+          <Select
             value={form.country}
             onChange={update("country")}
-            maxLength={2}
+            options={COUNTRY_OPTIONS}
             required
           />
         </Field>

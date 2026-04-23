@@ -5,6 +5,13 @@ import Link from "next/link";
 import { Field, TextInput, Textarea } from "../_components/Field";
 import { Stamp } from "../_components/Stamp";
 
+export interface PassportOption {
+  value: string;
+  label: string;
+  serial: string;
+  manufacturer: string;
+}
+
 interface RepairResult {
   sequenceNumber: number;
   consensusTimestamp: string;
@@ -16,11 +23,11 @@ interface RepairResult {
 
 type Status = "idle" | "submitting" | "ok" | "error";
 
-export function RepairForm() {
+export function RepairForm({ passports }: { passports: PassportOption[] }) {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const [result, setResult] = useState<RepairResult | null>(null);
-  const [passportId, setPassportId] = useState("");
+  const [passportId, setPassportId] = useState(passports[0]?.value ?? "");
   const [notes, setNotes] = useState("");
   const [partsText, setPartsText] = useState("descaler valve, 1");
   const [embodied, setEmbodied] = useState("3.2");
@@ -154,16 +161,36 @@ export function RepairForm() {
       <div className="grid md:grid-cols-2 gap-x-10 gap-y-6">
         <div className="md:col-span-2">
           <Field
-            label="Passport identifier"
+            label="Passport"
             number="1."
-            hint="token-serial · e.g. 0.0.8747375-8"
+            hint={`${passports.length} on record`}
           >
-            <TextInput
-              value={passportId}
-              onChange={(e) => setPassportId(e.target.value)}
-              placeholder="0.0.xxxx-1"
-              required
-            />
+            {passports.length === 0 ? (
+              <div className="pt-2 text-[12px] text-ink-faint italic">
+                No passports minted yet — run <span className="font-mono">pnpm seed</span> or mint one first.
+              </div>
+            ) : (
+              <div className="relative">
+                <select
+                  value={passportId}
+                  onChange={(e) => setPassportId(e.target.value)}
+                  className="appearance-none pr-7 cursor-pointer"
+                  required
+                >
+                  {passports.map((p) => (
+                    <option key={p.value} value={p.value}>
+                      {p.label} · by {p.manufacturer} · N° {p.serial}
+                    </option>
+                  ))}
+                </select>
+                <span className="pointer-events-none absolute right-0 bottom-2 text-ink-soft text-[11px]">
+                  ▾
+                </span>
+                <div className="mt-1 font-mono text-[10px] text-ink-faint">
+                  {passportId}
+                </div>
+              </div>
+            )}
           </Field>
         </div>
 

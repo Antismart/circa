@@ -1,4 +1,9 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes, ReactNode } from "react";
+import type {
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+  SelectHTMLAttributes,
+  ReactNode,
+} from "react";
 
 interface FieldWrapperProps {
   label: string;
@@ -36,4 +41,62 @@ export function TextInput(props: InputProps) {
 type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement>;
 export function Textarea(props: TextareaProps) {
   return <textarea {...props} />;
+}
+
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  options: SelectOption[];
+  placeholder?: string;
+}
+
+/** Native select styled to match the underline field aesthetic. */
+export function Select({ options, placeholder, className, ...rest }: SelectProps) {
+  return (
+    <div className="relative">
+      <select
+        {...rest}
+        className={`appearance-none pr-7 cursor-pointer ${className ?? ""}`}
+      >
+        {placeholder && (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        )}
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <span className="pointer-events-none absolute right-0 bottom-2 text-ink-soft text-[11px]">
+        ▾
+      </span>
+    </div>
+  );
+}
+
+interface ComboboxProps extends InputHTMLAttributes<HTMLInputElement> {
+  suggestions: string[];
+  listId: string;
+}
+
+/**
+ * Free-text input with a <datalist> of suggestions.
+ * User may pick from the list or type anything.
+ */
+export function Combobox({ suggestions, listId, ...rest }: ComboboxProps) {
+  return (
+    <>
+      <input {...rest} list={listId} />
+      <datalist id={listId}>
+        {suggestions.map((s) => (
+          <option key={s} value={s} />
+        ))}
+      </datalist>
+    </>
+  );
 }
