@@ -1,0 +1,51 @@
+# Internal docs — not public
+CLAUDE.md
+dpp_architecture.md
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# Prisma / SQLite
+prisma/dev.db
+prisma/dev.db-journal
+*.db
+*.db-journal
+
+# Hardhat
+artifacts/
+cache/
+typechain-types/
+
+# Passport data (regenerable from ledger state)
+data/passports/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Misc
+coverage/
+.pnp.*
+.yarn/
