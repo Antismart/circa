@@ -239,42 +239,44 @@ export default async function MarketplacePage() {
         <section className="mb-16">
           <SectionHeading
             number="§ II"
-            title={`Inventory held by ${role}`}
-            subtitle={`${owned.length} item${owned.length === 1 ? "" : "s"}`}
+            title={`Held by ${role}`}
+            subtitle={`${owned.length} item${owned.length === 1 ? "" : "s"} eligible for resale`}
           />
-          {role !== "manufacturer" ? (
-            <div className="border border-rule bg-paper-dim/50 p-5 text-[13px] text-ink-soft">
-              Tier 0 demo limits listing to the Manufacturer role. Switch in the
-              masthead to list any of the items below.
-            </div>
-          ) : (
-            <div className="divide-y divide-rule border-t border-b border-rule-strong">
-              {owned.map((item) => (
-                <article
-                  key={`${item.tokenId}-${item.serial}`}
-                  className="grid grid-cols-[1fr_auto] items-center gap-5 py-5"
-                >
-                  <div>
-                    <div className="label mb-1">{item.category}</div>
-                    <h3
-                      className="font-display text-[22px] leading-[1.02] text-ink"
-                      style={{ fontWeight: 500 }}
-                    >
-                      {item.name}
-                    </h3>
-                    <div className="mt-1 font-mono text-[10px] text-ink-faint">
-                      {item.tokenId}/{item.serial}
-                    </div>
+          <div className="divide-y divide-rule border-t border-b border-rule-strong">
+            {owned.map((item) => (
+              <article
+                key={`${item.tokenId}-${item.serial}`}
+                className="grid grid-cols-[1fr_auto] items-center gap-5 py-5"
+              >
+                <div>
+                  <div className="label mb-1">{item.category}</div>
+                  <h3
+                    className="font-display text-[22px] leading-[1.02] text-ink"
+                    style={{ fontWeight: 500 }}
+                  >
+                    {item.name}
+                  </h3>
+                  <div className="mt-1 font-mono text-[10px] text-ink-faint">
+                    {item.tokenId}/{item.serial}
                   </div>
+                </div>
+                {role === "manufacturer" ? (
                   <ListForm
                     tokenId={item.tokenId}
                     serial={item.serial}
                     defaultPrice={120}
                   />
-                </article>
-              ))}
-            </div>
-          )}
+                ) : (
+                  <span
+                    className="text-[11px] tracking-[0.14em] uppercase text-ink-faint"
+                    title="Tier 0: only the Manufacturer may list"
+                  >
+                    switch to manufacturer to list
+                  </span>
+                )}
+              </article>
+            ))}
+          </div>
         </section>
       )}
 
