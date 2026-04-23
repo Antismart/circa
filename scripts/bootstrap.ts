@@ -140,7 +140,7 @@ async function createCollection(
     .setFallbackFee(new CustomFixedFee().setHbarAmount(new Hbar(ROYALTY_FALLBACK_HBAR)));
 
   const tx = new TokenCreateTransaction()
-    .setTokenName("Circular Digital Product Passport")
+    .setTokenName("circa Digital Product Passport")
     .setTokenSymbol("CIRCA-DPP")
     .setTokenType(TokenType.NonFungibleUnique)
     .setSupplyType(TokenSupplyType.Infinite)
@@ -195,7 +195,7 @@ async function associate(
 }
 
 async function main(): Promise<void> {
-  console.log("── Circular DPP bootstrap ──");
+  console.log("── circa · bootstrap ──");
   console.log(`Network: ${optionalEnv("HEDERA_NETWORK") ?? "testnet"}`);
   console.log(`Operator: ${operatorId.toString()}`);
   console.log(`Force rebuild: ${FORCE ? "yes" : "no"}`);

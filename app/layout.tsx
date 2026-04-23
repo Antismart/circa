@@ -27,7 +27,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Circular — Digital Product Passport",
+  title: "circa — Digital Product Passport",
   description:
     "Every physical good gets a passport that travels with it. Proof of materials, repairs, ownership — anchored to Hedera, readable by anyone with a camera.",
 };
@@ -55,10 +55,10 @@ function Masthead() {
         <div className="mt-4 flex items-end justify-between gap-6">
           <Link href="/" className="block">
             <h1
-              className="font-display leading-[0.85] text-[64px] md:text-[92px] tracking-[-0.02em] text-ink"
+              className="font-display leading-[0.85] text-[72px] md:text-[108px] tracking-[-0.035em] text-ink lowercase"
               style={{ fontWeight: 500, fontStyle: "italic" }}
             >
-              Circular
+              circa
             </h1>
           </Link>
           <div className="pb-2">

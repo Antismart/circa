@@ -28,7 +28,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  console.log("── Circular DPP demo reset ──");
+  console.log("── circa · demo reset ──");
   console.log("Wiping local cache only. HTS collection, HCS topic, and demo accounts persist.\n");
 
   let dbCleared = 0;

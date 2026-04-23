@@ -2,7 +2,7 @@
   "name": "circa",
   "version": "0.1.0",
   "private": true,
-  "description": "Digital Product Passport on Hedera — Tier 0 hackathon build",
+  "description": "circa — Digital Product Passport on Hedera",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

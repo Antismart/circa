@@ -133,7 +133,7 @@ async function seedOne(product: SeedProduct, manufacturerAccountId: string): Pro
 }
 
 async function main(): Promise<void> {
-  console.log("── Circular DPP seed ──");
+  console.log("── circa · seed ──");
   const manufacturerAccountId = requireEnv("MANUFACTURER_ACCOUNT_ID");
   requireEnv("HTS_COLLECTION_ID");
   requireEnv("HCS_TOPIC_ID");

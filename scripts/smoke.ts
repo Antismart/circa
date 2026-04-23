@@ -11,7 +11,7 @@ import { getEventsForToken, submitEvent } from "../lib/hcs";
 import { requireEnv } from "../lib/hedera";
 
 async function main(): Promise<void> {
-  console.log("── Track 1 smoke test ──");
+  console.log("── circa · smoke test ──");
   console.log("This will mint one real testnet NFT and write one HCS event.");
   console.log("");
 
