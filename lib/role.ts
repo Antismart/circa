@@ -32,4 +32,26 @@ export function roleSigningKey(role: Role): PrivateKey {
   }
 }
 
+export function roleForAccountId(accountId: string): Role | null {
+  const map: Array<[Role, string]> = [
+    ["manufacturer", requireEnv("MANUFACTURER_ACCOUNT_ID")],
+    ["consumer", requireEnv("CONSUMER_ACCOUNT_ID")],
+    ["repairer", requireEnv("REPAIRER_ACCOUNT_ID")],
+  ];
+  for (const [role, id] of map) {
+    if (id === accountId) return role;
+  }
+  return null;
+}
+
+export function keyForAccountId(accountId: string): PrivateKey {
+  const role = roleForAccountId(accountId);
+  if (!role) {
+    throw new Error(
+      `unknown account id ${accountId} — Tier 0 only supports the three demo roles`
+    );
+  }
+  return roleSigningKey(role);
+}
+
 export type { Role } from "./roles";

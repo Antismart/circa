@@ -5,16 +5,19 @@
   "description": "circa — Digital Product Passport on Hedera",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "hardhat compile",
     "build": "next build",
+    "predev": "hardhat compile --quiet",
     "start": "next start",
     "lint": "next lint",
     "bootstrap": "tsx scripts/bootstrap.ts",
+    "setup:evm": "tsx scripts/setup-evm.ts",
     "seed": "tsx scripts/seed.ts",
     "demo:reset": "tsx scripts/demo-reset.ts",
     "smoke": "tsx scripts/smoke.ts",
     "hardhat:compile": "hardhat compile",
     "hardhat:test": "hardhat test",
-    "hardhat:deploy": "hardhat run scripts/deploy.ts --network hederaTestnet"
+    "hardhat:deploy": "hardhat run scripts/deploy.cjs --network hederaTestnet"
   },
   "dependencies": {
     "@hashgraph/sdk": "^2.54.0",
@@ -26,13 +29,24 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
+    "@nomicfoundation/hardhat-ethers": "^3",
     "@tailwindcss/postcss": "^4.2.4",
+    "@types/chai": "^4.3.20",
+    "@types/chai-as-promised": "^7.1.8",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.10.5",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "chai": "^4.5.0",
+    "chai-as-promised": "^7.1.2",
+    "ethers": "^6.16.0",
+    "hardhat": "^2.28.6",
     "prisma": "^5.22.0",
+    "solc": "^0.8.34",
     "tailwindcss": "^4.2.4",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },

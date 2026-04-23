@@ -95,6 +95,55 @@ export async function transferPassportNft(args: TransferArgs): Promise<string> {
   return submit.transactionId.toString();
 }
 
+export interface SettleResaleArgs {
+  serial: number;
+  sellerAccountId: string;
+  sellerKey: PrivateKey;
+  buyerAccountId: string;
+  buyerKey: PrivateKey;
+  priceTinybars: bigint;
+}
+
+/**
+ * Atomic resale: NFT moves seller→buyer, HBAR moves buyer→seller, all in one
+ * TransferTransaction. Hedera's CustomRoyaltyFee on the collection automatically
+ * deducts the 2.5% royalty from the seller-bound HBAR leg and pays the fee
+ * collector (the manufacturer) at consensus. Requires signatures from both
+ * the seller (for the NFT leg) and the buyer (for the HBAR leg).
+ */
+export async function settleResale(args: SettleResaleArgs): Promise<{
+  txId: string;
+  consensusTimestamp: string | null;
+}> {
+  const client = getClient();
+  const tokenId = getCollectionId();
+  const from = AccountId.fromString(args.sellerAccountId);
+  const to = AccountId.fromString(args.buyerAccountId);
+
+  const price = Hbar.from(
+    Long.fromString(args.priceTinybars.toString()),
+    HbarUnit.Tinybar
+  );
+
+  const tx = new TransferTransaction()
+    .addNftTransfer(tokenId, args.serial, from, to)
+    .addHbarTransfer(to, price.negated())
+    .addHbarTransfer(from, price)
+    .freezeWith(client);
+
+  const signedBySeller = await tx.sign(args.sellerKey);
+  const signedByBuyer = await signedBySeller.sign(args.buyerKey);
+  const submit = await signedByBuyer.execute(client);
+  await submit.getReceipt(client);
+  const record = await submit.getRecord(client);
+  return {
+    txId: submit.transactionId.toString(),
+    consensusTimestamp: record.consensusTimestamp
+      ? record.consensusTimestamp.toString()
+      : null,
+  };
+}
+
 export async function associateAccountWithCollection(
   accountId: string,
   accountKey: PrivateKey
