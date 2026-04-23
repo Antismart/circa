@@ -1,0 +1,38 @@
+{
+  "name": "circa",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Digital Product Passport on Hedera — Tier 0 hackathon build",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "bootstrap": "tsx scripts/bootstrap.ts",
+    "seed": "tsx scripts/seed.ts",
+    "demo:reset": "tsx scripts/demo-reset.ts",
+    "smoke": "tsx scripts/smoke.ts",
+    "hardhat:compile": "hardhat compile",
+    "hardhat:test": "hardhat test",
+    "hardhat:deploy": "hardhat run scripts/deploy.ts --network hederaTestnet"
+  },
+  "dependencies": {
+    "@hashgraph/sdk": "^2.54.0",
+    "@prisma/client": "^5.22.0",
+    "dotenv": "^16.4.7",
+    "next": "^15.1.3",
+    "qrcode": "^1.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@10.17.1"
+}
