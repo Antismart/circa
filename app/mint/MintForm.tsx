@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Field, TextInput, Textarea, Select, Combobox } from "../_components/Field";
 import { Stamp } from "../_components/Stamp";
+import { isValidGtin14, gtinCheckDigit } from "../../lib/gtin";
 
 const COUNTRY_OPTIONS = [
   { value: "DE", label: "Germany" },
@@ -52,6 +53,7 @@ const MATERIALS_PLACEHOLDER = `[
 
 type FormState = {
   name: string;
+  gtin: string;
   category: string;
   manufacturerName: string;
   country: string;
@@ -68,6 +70,7 @@ type FormState = {
 function emptyForm(today: string): FormState {
   return {
     name: "",
+    gtin: "",
     category: "",
     manufacturerName: "",
     country: "",
@@ -82,9 +85,15 @@ function emptyForm(today: string): FormState {
   };
 }
 
+// A valid 14-digit test GTIN. The '009' prefix is inside the reserved
+// GS1-US internal range, safe for demos.
+const DEMO_GTIN_PREFIX_13 = "0090000000042";
+const DEMO_GTIN = DEMO_GTIN_PREFIX_13 + gtinCheckDigit(DEMO_GTIN_PREFIX_13);
+
 function demoExample(today: string): FormState {
   return {
     name: "Aurora Pro Espresso Machine",
+    gtin: DEMO_GTIN,
     category: "kitchen-appliance/espresso-machine",
     manufacturerName: "Aurora Kaffeemaschinen GmbH",
     country: "DE",
@@ -106,6 +115,7 @@ function demoExample(today: string): FormState {
 interface MintResult {
   tokenId: string;
   serial: number;
+  gtin: string;
   txId: string;
   publicUrl: string;
   qrDataUrl: string;
@@ -119,6 +129,44 @@ type MaterialsCheck =
   | { state: "empty" }
   | { state: "invalid"; message: string }
   | { state: "valid"; count: number; totalMass: number; avgRecycled: number };
+
+function GtinCheck({ value }: { value: string }) {
+  const trimmed = value.replace(/\s+/g, "");
+  if (!trimmed) {
+    return (
+      <div className="mt-2 text-[11px] font-mono text-ink-faint italic">
+        waiting for 14-digit GTIN…
+      </div>
+    );
+  }
+  if (!/^[0-9]+$/.test(trimmed)) {
+    return (
+      <div className="mt-2 text-[11px] font-mono text-stamp">
+        ⚠ GTIN must be digits only
+      </div>
+    );
+  }
+  if (trimmed.length !== 14) {
+    return (
+      <div className="mt-2 text-[11px] font-mono text-ink-faint">
+        {trimmed.length}/14 digits…
+      </div>
+    );
+  }
+  if (!isValidGtin14(trimmed)) {
+    const expected = gtinCheckDigit(trimmed.slice(0, 13));
+    return (
+      <div className="mt-2 text-[11px] font-mono text-stamp">
+        ⚠ invalid check digit · expected {expected}, got {trimmed[13]}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-2 text-[11px] font-mono text-accent">
+      ✓ valid GS1 GTIN-14
+    </div>
+  );
+}
 
 function checkMaterials(text: string): MaterialsCheck {
   const trimmed = text.trim();
@@ -205,6 +253,13 @@ export function MintForm() {
     e.preventDefault();
     setStatus("submitting");
     setMessage("Preparing passport dossier…");
+    if (!isValidGtin14(form.gtin.replace(/\s+/g, ""))) {
+      setStatus("error");
+      setMessage(
+        "Enter a valid 14-digit GS1 GTIN with correct Mod-10 check digit before minting."
+      );
+      return;
+    }
     if (materialsCheck.state !== "valid") {
       setStatus("error");
       setMessage(
@@ -222,6 +277,7 @@ export function MintForm() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           name: form.name,
+          gtin: form.gtin.replace(/\s+/g, ""),
           category: form.category,
           manufacturerName: form.manufacturerName,
           country: form.country,
@@ -302,12 +358,15 @@ export function MintForm() {
                 <dd className="font-mono text-[12px] break-all">{result.publicUrl}</dd>
               </div>
               <div className="flex flex-wrap gap-3 mt-6">
-                <Link href={`/p/${result.tokenId}-${result.serial}`} className="btn-primary">
+                <Link
+                  href={`/01/${result.gtin}/21/${result.serial}`}
+                  className="btn-primary"
+                >
                   Open passport →
                 </Link>
                 <a
                   href={result.qrDataUrl}
-                  download={`passport-${result.tokenId}-${result.serial}.png`}
+                  download={`passport-${result.gtin}-${result.serial}.png`}
                   className="btn-ghost"
                 >
                   Download QR
@@ -362,7 +421,37 @@ export function MintForm() {
             />
           </Field>
         </div>
-        <Field label="Category" number="2." hint="pick or type your own">
+        <div className="md:col-span-2">
+          <Field
+            label="GTIN-14"
+            number="2."
+            hint={
+              <span>
+                14-digit GS1 code · no code?{" "}
+                <a
+                  href="https://www.gs1.org/standards/get-barcodes"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline decoration-rule-strong underline-offset-4 hover:decoration-accent"
+                >
+                  gs1.org
+                </a>
+              </span>
+            }
+          >
+            <TextInput
+              value={form.gtin}
+              onChange={update("gtin")}
+              placeholder="00900000000428"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={14}
+              required
+            />
+            <GtinCheck value={form.gtin} />
+          </Field>
+        </div>
+        <Field label="Category" number="3." hint="pick or type your own">
           <Combobox
             listId="mint-category-options"
             value={form.category}
@@ -372,7 +461,7 @@ export function MintForm() {
             required
           />
         </Field>
-        <Field label="Date of manufacture" number="3.">
+        <Field label="Date of manufacture" number="4.">
           <TextInput
             type="date"
             value={form.dateOfManufacture}
@@ -385,7 +474,7 @@ export function MintForm() {
           <div className="label mb-4">Manufacturer</div>
         </div>
         <div className="md:col-span-2">
-          <Field label="Legal name" number="4.">
+          <Field label="Legal name" number="5.">
             <TextInput
               value={form.manufacturerName}
               onChange={update("manufacturerName")}
@@ -394,7 +483,7 @@ export function MintForm() {
             />
           </Field>
         </div>
-        <Field label="Country" number="5." hint="country of manufacture">
+        <Field label="Country" number="6." hint="country of manufacture">
           <Select
             value={form.country}
             onChange={update("country")}
@@ -403,7 +492,7 @@ export function MintForm() {
             required
           />
         </Field>
-        <Field label="City" number="6.">
+        <Field label="City" number="7.">
           <TextInput
             value={form.city}
             onChange={update("city")}
@@ -418,7 +507,7 @@ export function MintForm() {
         <div className="md:col-span-2">
           <Field
             label="Composition"
-            number="7."
+            number="8."
             hint="JSON array · material, mass_g, recycledPercent"
           >
             <Textarea
@@ -459,7 +548,7 @@ export function MintForm() {
             </div>
           )}
         </div>
-        <Field label="Materials" number="8.a">
+        <Field label="Materials" number="9.a">
           <TextInput
             type="number"
             step="0.1"
@@ -469,7 +558,7 @@ export function MintForm() {
             required
           />
         </Field>
-        <Field label="Manufacturing" number="8.b">
+        <Field label="Manufacturing" number="9.b">
           <TextInput
             type="number"
             step="0.1"
@@ -479,7 +568,7 @@ export function MintForm() {
             required
           />
         </Field>
-        <Field label="Transport" number="8.c">
+        <Field label="Transport" number="9.c">
           <TextInput
             type="number"
             step="0.1"
@@ -493,7 +582,7 @@ export function MintForm() {
         <div className="md:col-span-2 pt-4 mt-2 border-t border-rule">
           <div className="label mb-4">Durability claims</div>
         </div>
-        <Field label="Repairability score" number="9." hint="0.0 – 10.0">
+        <Field label="Repairability score" number="10." hint="0.0 – 10.0">
           <TextInput
             type="number"
             step="0.1"
@@ -505,7 +594,7 @@ export function MintForm() {
             required
           />
         </Field>
-        <Field label="Expected lifetime" number="10." hint="years">
+        <Field label="Expected lifetime" number="11." hint="years">
           <TextInput
             type="number"
             min="1"

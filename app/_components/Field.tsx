@@ -8,7 +8,7 @@ import type {
 interface FieldWrapperProps {
   label: string;
   number?: string;
-  hint?: string;
+  hint?: ReactNode;
   children: ReactNode;
 }
 

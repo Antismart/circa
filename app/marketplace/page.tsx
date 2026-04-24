@@ -11,6 +11,7 @@ interface ActiveListing {
   marketplaceListingId: string;
   tokenId: string;
   serial: number;
+  gtin: string;
   name: string;
   manufacturer: string;
   category: string;
@@ -22,6 +23,7 @@ interface ActiveListing {
 interface OwnedItem {
   tokenId: string;
   serial: number;
+  gtin: string;
   name: string;
   category: string;
 }
@@ -29,6 +31,7 @@ interface OwnedItem {
 interface SoldRecord {
   tokenId: string;
   serial: number;
+  gtin: string;
   name: string;
   priceHbar: number;
   royaltyHbar: number;
@@ -69,6 +72,7 @@ async function fetchData(currentAccountId: string) {
       marketplaceListingId: l.marketplaceListingId,
       tokenId: l.passport.tokenId,
       serial: l.passport.serialNumber,
+      gtin: l.passport.gtin,
       name: p.name,
       manufacturer: p.manufacturer.name,
       category: p.category,
@@ -87,6 +91,7 @@ async function fetchData(currentAccountId: string) {
     soldRecords.push({
       tokenId: l.passport.tokenId,
       serial: l.passport.serialNumber,
+      gtin: l.passport.gtin,
       name: p.name,
       priceHbar,
       royaltyHbar: Math.round(priceHbar * 0.025 * 1000) / 1000,
@@ -102,6 +107,7 @@ async function fetchData(currentAccountId: string) {
     owned.push({
       tokenId: r.tokenId,
       serial: r.serialNumber,
+      gtin: r.gtin,
       name: p.name,
       category: p.category,
     });
@@ -193,7 +199,7 @@ export default async function MarketplacePage() {
                     <div className="mt-1 text-[12px] text-ink-soft">
                       <span className="italic">by</span> {item.manufacturer} ·{" "}
                       <Link
-                        href={`/p/${item.tokenId}-${item.serial}`}
+                        href={`/01/${item.gtin}/21/${item.serial}`}
                         className="underline decoration-rule-strong underline-offset-4 hover:decoration-accent hover:text-accent"
                       >
                         inspect passport
@@ -295,7 +301,7 @@ export default async function MarketplacePage() {
               >
                 <div>
                   <Link
-                    href={`/p/${s.tokenId}-${s.serial}`}
+                    href={`/01/${s.gtin}/21/${s.serial}`}
                     className="font-display text-[18px] text-ink hover:text-accent"
                     style={{ fontWeight: 500 }}
                   >

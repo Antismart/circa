@@ -47,7 +47,7 @@ export interface Passport {
 }
 
 export interface BuildPassportInput {
-  gtinStub: string;
+  gtin: string;
   serialNumber: string;
   name: string;
   category: string;
@@ -86,7 +86,7 @@ export function buildPassport(input: BuildPassportInput): Passport {
     "@context": ["https://schema.org", "https://dpp.xyz/contexts/v1"],
     "@id": `tier0:hedera-testnet:pending`,
     type: ["Product", "DigitalProductPassport"],
-    gtin: input.gtinStub,
+    gtin: input.gtin,
     serialNumber: input.serialNumber,
     name: input.name,
     category: input.category,
@@ -148,6 +148,11 @@ export async function getPassport(
   return row.passportJson as unknown as Passport;
 }
 
-export function buildDlPath(tokenId: string, onChainSerial: number): string {
-  return `/p/${tokenId}-${onChainSerial}`;
+/**
+ * GS1 Digital Link resolver path. Format:
+ *   /01/{14-digit-GTIN}/21/{serial}
+ * This is the URL encoded in QR codes and the NFT metadata pointer.
+ */
+export function buildDlPath(gtin: string, onChainSerial: number): string {
+  return `/01/${gtin}/21/${onChainSerial}`;
 }

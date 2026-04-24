@@ -6,6 +6,7 @@ import {
   type BuildPassportInput,
 } from "../lib/passport";
 import type { Prisma } from "@prisma/client";
+import { makeGtin14 } from "../lib/gtin";
 import { buildNftMetadata, mintPassportNft } from "../lib/hts";
 import { submitEvent } from "../lib/hcs";
 import { requireEnv } from "../lib/hedera";
@@ -18,7 +19,7 @@ interface SeedProduct extends Omit<BuildPassportInput, "manufacturerAccountId"> 
 const PRODUCTS: SeedProduct[] = [
   {
     key: "coffee-machine",
-    gtinStub: "STUB-CIRCA-0000001",
+    gtin: makeGtin14("0090000000101"),
     serialNumber: "CM-2026-0001",
     name: "Aurora Pro Espresso Machine",
     category: "kitchen-appliance/espresso-machine",
@@ -40,7 +41,7 @@ const PRODUCTS: SeedProduct[] = [
   },
   {
     key: "e-bike",
-    gtinStub: "STUB-CIRCA-0000002",
+    gtin: makeGtin14("0090000000202"),
     serialNumber: "EB-2026-0001",
     name: "Velox City Commuter E-Bike",
     category: "mobility/e-bike",
@@ -62,7 +63,7 @@ const PRODUCTS: SeedProduct[] = [
   },
   {
     key: "office-chair",
-    gtinStub: "STUB-CIRCA-0000003",
+    gtin: makeGtin14("0090000000303"),
     serialNumber: "OC-2026-0001",
     name: "Nord Ergonomic Task Chair",
     category: "furniture/office-chair",
@@ -99,7 +100,7 @@ async function seedOne(product: SeedProduct, manufacturerAccountId: string): Pro
     data: {
       tokenId: mint.tokenId,
       serialNumber: mint.serial,
-      gtinStub: product.gtinStub,
+      gtin: product.gtin,
       ownerAccountId: manufacturerAccountId,
       manufacturerAccountId,
       currentContentHash: finalized.integrity.contentHash,
@@ -146,12 +147,12 @@ async function main(): Promise<void> {
   const network = process.env.HEDERA_NETWORK ?? "testnet";
   const rows = await prisma.passport.findMany({
     orderBy: { createdAt: "asc" },
-    select: { tokenId: true, serialNumber: true, gtinStub: true },
+    select: { tokenId: true, serialNumber: true, gtin: true },
   });
   console.log("\n── Summary ──");
   for (const r of rows) {
     console.log(
-      `  ${r.gtinStub.padEnd(22)}  ${r.tokenId}/${r.serialNumber}  ` +
+      `  ${r.gtin.padEnd(16)}  ${r.tokenId}/${r.serialNumber}  ` +
         `https://hashscan.io/${network}/token/${r.tokenId}/${r.serialNumber}`
     );
   }

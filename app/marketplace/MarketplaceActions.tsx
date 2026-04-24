@@ -92,6 +92,7 @@ interface BuyResult {
   resaleEventSeqNum: number;
   tokenId: string;
   serial: number;
+  gtin: string;
 }
 
 export function BuyButton({
@@ -176,7 +177,7 @@ export function BuyButton({
         </div>
         <div className="mt-4">
           <Link
-            href={`/p/${result.tokenId}-${result.serial}`}
+            href={`/01/${result.gtin}/21/${result.serial}`}
             className="btn-primary"
           >
             Rescan passport →

@@ -7,6 +7,7 @@ import {
 import { buildNftMetadata, mintPassportNft } from "../lib/hts";
 import { getEventsForToken, submitEvent } from "../lib/hcs";
 import { requireEnv } from "../lib/hedera";
+import { makeGtin14 } from "../lib/gtin";
 
 async function main(): Promise<void> {
   console.log("── circa · smoke test ──");
@@ -19,7 +20,7 @@ async function main(): Promise<void> {
 
   console.log("Step 1: build passport");
   const passport = buildPassport({
-    gtinStub: "STUB-CIRCA-SMOKE-0001",
+    gtin: makeGtin14("0090000000999"),
     serialNumber: "SMOKE-001",
     name: "Aurora Pro Espresso Machine (smoke test)",
     category: "kitchen-appliance/espresso-machine",
@@ -44,7 +45,7 @@ async function main(): Promise<void> {
 
   console.log("Step 2: mint NFT on HTS");
   const metadata = buildNftMetadata(
-    buildDlPath("pending", 0),
+    buildDlPath(passport.gtin, 0),
     passport.integrity.contentHash
   );
   console.log(`  metadata: ${metadata.byteLength} bytes`);

@@ -88,6 +88,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       consensusTimestamp: submit.consensusTimestamp,
       txId: submit.txId,
       actor,
+      gtin: passportRow.gtin,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

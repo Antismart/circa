@@ -19,6 +19,7 @@ interface RepairResult {
   actor: string;
   tokenId: string;
   serial: number;
+  gtin: string;
 }
 
 type Status = "idle" | "submitting" | "ok" | "error";
@@ -136,7 +137,7 @@ export function RepairForm({ passports }: { passports: PassportOption[] }) {
         </dl>
         <div className="mt-8 flex gap-3">
           <Link
-            href={`/p/${result.tokenId}-${result.serial}`}
+            href={`/01/${result.gtin}/21/${result.serial}`}
             className="btn-primary"
           >
             View updated passport →

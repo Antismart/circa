@@ -208,6 +208,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         resaleEventSeqNum: hcs.sequenceNumber,
         tokenId: listing.passport.tokenId,
         serial: listing.passport.serialNumber,
+        gtin: listing.passport.gtin,
       });
     }
 

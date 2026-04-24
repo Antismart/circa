@@ -8,6 +8,7 @@ import {
 } from "@/lib/passport";
 import type { Prisma } from "@prisma/client";
 import { buildNftMetadata, mintPassportNft } from "@/lib/hts";
+import { isValidGtin14, normalizeGtin } from "@/lib/gtin";
 import { submitEvent } from "@/lib/hcs";
 import { prisma } from "@/lib/db";
 import { getRoleFromCookie, roleAccountId } from "@/lib/role";
@@ -28,7 +29,7 @@ interface MintPayload {
   repairabilityScore: number;
   expectedLifetimeYears: number;
   imageUrl?: string;
-  gtinStub?: string;
+  gtin: string;
   serialNumber?: string;
 }
 
@@ -88,10 +89,20 @@ export async function POST(req: Request): Promise<NextResponse> {
     const serialNumber =
       body.serialNumber?.trim() ||
       `${category.split("/")[0].slice(0, 2).toUpperCase()}-${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`;
-    const gtinStub = body.gtinStub?.trim() || `STUB-CIRCA-${Date.now().toString().slice(-7)}`;
+
+    const gtin = normalizeGtin(body.gtin);
+    if (!gtin || !isValidGtin14(gtin)) {
+      return NextResponse.json(
+        {
+          error:
+            "GTIN is required and must be a valid 14-digit GS1 code with a correct Mod-10 check digit.",
+        },
+        { status: 400 }
+      );
+    }
 
     const passport = buildPassport({
-      gtinStub,
+      gtin,
       serialNumber,
       name,
       category,
@@ -112,8 +123,11 @@ export async function POST(req: Request): Promise<NextResponse> {
       imageUrl: body.imageUrl,
     });
 
+    // We know the GTIN but not the on-chain serial yet; HTS assigns it.
+    // Use a placeholder serial in the metadata pointer; the finalized passport
+    // carries the correct URL in its @id + integrity fields.
     const metadata = buildNftMetadata(
-      buildDlPath("pending", 0),
+      buildDlPath(gtin, 0),
       passport.integrity.contentHash
     );
     const mint = await mintPassportNft(metadata);
@@ -124,7 +138,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       data: {
         tokenId: mint.tokenId,
         serialNumber: mint.serial,
-        gtinStub,
+        gtin,
         ownerAccountId: manufacturerAccountId,
         manufacturerAccountId,
         currentContentHash: finalized.integrity.contentHash,
@@ -154,7 +168,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     });
 
     const appUrl = optionalEnv("NEXT_PUBLIC_APP_URL") ?? "http://localhost:3000";
-    const publicUrl = `${appUrl}/p/${mint.tokenId}-${mint.serial}`;
+    const publicUrl = `${appUrl}/01/${gtin}/21/${mint.serial}`;
     const qrDataUrl = await QRCode.toDataURL(publicUrl, {
       margin: 1,
       width: 512,
@@ -164,6 +178,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({
       tokenId: mint.tokenId,
       serial: mint.serial,
+      gtin,
       txId: mint.txId,
       publicUrl,
       qrDataUrl,

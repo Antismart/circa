@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 interface CatalogItem {
   tokenId: string;
   serial: number;
+  gtin: string;
   name: string;
   category: string;
   manufacturer: string;
@@ -27,6 +28,7 @@ async function fetchCatalog(): Promise<CatalogItem[]> {
     items.push({
       tokenId: row.tokenId,
       serial: row.serialNumber,
+      gtin: row.gtin,
       name: passport.name,
       category: passport.category,
       manufacturer: passport.manufacturer.name,
@@ -42,7 +44,7 @@ function CatalogCard({ item, index }: { item: CatalogItem; index: number }) {
   const display = String(index + 1).padStart(3, "0");
   return (
     <Link
-      href={`/p/${item.tokenId}-${item.serial}`}
+      href={`/01/${item.gtin}/21/${item.serial}`}
       className="group block relative bg-paper-dim/40 hover:bg-paper-dim/80 border border-rule hover:border-ink transition-colors p-6 pb-7"
     >
       <div className="flex items-baseline justify-between mb-5">
