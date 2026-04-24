@@ -48,3 +48,4 @@ typechain-types/
 coverage/
 .pnp.*
 .yarn/
+data/
