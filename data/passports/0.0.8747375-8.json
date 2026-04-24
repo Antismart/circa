@@ -1,0 +1,63 @@
+{
+  "@context": [
+    "https://schema.org",
+    "https://dpp.xyz/contexts/v1"
+  ],
+  "@id": "tier0:hedera-testnet:0.0.8747375/8",
+  "type": [
+    "Product",
+    "DigitalProductPassport"
+  ],
+  "gtin": "STUB-CIRCA-0000001",
+  "serialNumber": "CM-2026-0001",
+  "name": "Aurora Pro Espresso Machine",
+  "category": "kitchen-appliance/espresso-machine",
+  "manufacturer": {
+    "name": "Aurora Kaffeemaschinen GmbH",
+    "accountId": "0.0.8747372"
+  },
+  "dateOfManufacture": "2026-03-14",
+  "placeOfManufacture": {
+    "country": "DE",
+    "city": "Gütersloh"
+  },
+  "public": {
+    "materialComposition": [
+      {
+        "material": "steel-304",
+        "mass_g": 4200,
+        "recycledPercent": 42
+      },
+      {
+        "material": "abs-plastic",
+        "mass_g": 620,
+        "recycledPercent": 18
+      },
+      {
+        "material": "copper",
+        "mass_g": 380,
+        "recycledPercent": 55
+      },
+      {
+        "material": "aluminum-6061",
+        "mass_g": 910,
+        "recycledPercent": 70
+      }
+    ],
+    "carbonFootprint": {
+      "total_kgCO2e": 87.4,
+      "breakdown": {
+        "materials": 52.1,
+        "manufacturing": 18.3,
+        "transport": 17
+      }
+    },
+    "repairabilityScore": 7.2,
+    "expectedLifetimeYears": 12
+  },
+  "integrity": {
+    "contentHash": "sha256:6f673a9f8022b94b9e611990b16b86f364f416ae518732ac4b8eade38c10e647",
+    "hederaAnchorTx": "0.0.5776126@1776946458.812095524",
+    "version": 1
+  }
+}

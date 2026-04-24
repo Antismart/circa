@@ -1,0 +1,63 @@
+{
+  "@context": [
+    "https://schema.org",
+    "https://dpp.xyz/contexts/v1"
+  ],
+  "@id": "tier0:hedera-testnet:0.0.8747375/9",
+  "type": [
+    "Product",
+    "DigitalProductPassport"
+  ],
+  "gtin": "STUB-CIRCA-0000002",
+  "serialNumber": "EB-2026-0001",
+  "name": "Velox City Commuter E-Bike",
+  "category": "mobility/e-bike",
+  "manufacturer": {
+    "name": "Velox Mobility BV",
+    "accountId": "0.0.8747372"
+  },
+  "dateOfManufacture": "2026-02-01",
+  "placeOfManufacture": {
+    "country": "NL",
+    "city": "Utrecht"
+  },
+  "public": {
+    "materialComposition": [
+      {
+        "material": "aluminum-6061",
+        "mass_g": 9800,
+        "recycledPercent": 68
+      },
+      {
+        "material": "li-ion-battery",
+        "mass_g": 2400,
+        "recycledPercent": 22
+      },
+      {
+        "material": "rubber",
+        "mass_g": 1500,
+        "recycledPercent": 35
+      },
+      {
+        "material": "steel-304",
+        "mass_g": 1100,
+        "recycledPercent": 50
+      }
+    ],
+    "carbonFootprint": {
+      "total_kgCO2e": 164,
+      "breakdown": {
+        "materials": 102,
+        "manufacturing": 32,
+        "transport": 30
+      }
+    },
+    "repairabilityScore": 8.1,
+    "expectedLifetimeYears": 10
+  },
+  "integrity": {
+    "contentHash": "sha256:267f2db5f05cf503ab531988890e37e7e15f9940bd4ba0dd2f3064a6c6443369",
+    "hederaAnchorTx": "0.0.5776126@1776946466.373570201",
+    "version": 1
+  }
+}

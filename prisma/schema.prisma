@@ -1,8 +1,8 @@
-// Tier 0 index/cache. Rebuildable from Hedera mirror node + on-disk passport JSON.
+// Tier 0 index/cache. Rebuildable from Hedera mirror node + on-chain NFT state.
 // Never write to this DB without a corresponding on-chain write. On-chain is truth.
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,7 +18,7 @@ model Passport {
   ownerAccountId        String
   manufacturerAccountId String
   currentContentHash    String
-  passportJsonPath      String
+  passportJson          Json
   mintTxId              String   @unique
   createdAt             DateTime @default(now())
 

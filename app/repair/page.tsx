@@ -1,7 +1,7 @@
 import { RepairForm, type PassportOption } from "./RepairForm";
 import { getRoleFromCookie } from "@/lib/role";
 import { prisma } from "@/lib/db";
-import { loadPassport } from "@/lib/passport";
+import { getPassport } from "@/lib/passport";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ async function listPassportOptions(): Promise<PassportOption[]> {
   });
   const options: PassportOption[] = [];
   for (const row of rows) {
-    const passport = loadPassport(row.tokenId, row.serialNumber);
+    const passport = await getPassport(row.tokenId, row.serialNumber);
     if (!passport) continue;
     options.push({
       value: `${row.tokenId}-${row.serialNumber}`,

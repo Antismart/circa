@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { prisma } from "./db";
 
 export interface Material {
   material: string;
@@ -62,8 +61,6 @@ export interface BuildPassportInput {
   expectedLifetimeYears: number;
   imageUrl?: string;
 }
-
-const PASSPORTS_DIR = join(process.cwd(), "data", "passports");
 
 function canonicalize(value: unknown): unknown {
   if (value === null || typeof value !== "object") return value;
@@ -134,28 +131,21 @@ export function finalizePassport(
   return finalized;
 }
 
-export function passportPath(tokenId: string, onChainSerial: number): string {
-  return join(PASSPORTS_DIR, `${tokenId}-${onChainSerial}.json`);
-}
-
-export function savePassport(
-  passport: Passport,
+/**
+ * Fetch the canonical passport document. Reads from the Prisma Passport.passportJson
+ * JSONB column (post-Postgres migration). Returns null if the row doesn't exist.
+ */
+export async function getPassport(
   tokenId: string,
   onChainSerial: number
-): string {
-  if (!existsSync(PASSPORTS_DIR)) mkdirSync(PASSPORTS_DIR, { recursive: true });
-  const path = passportPath(tokenId, onChainSerial);
-  writeFileSync(path, `${JSON.stringify(passport, null, 2)}\n`);
-  return path;
-}
-
-export function loadPassport(
-  tokenId: string,
-  onChainSerial: number
-): Passport | null {
-  const path = passportPath(tokenId, onChainSerial);
-  if (!existsSync(path)) return null;
-  return JSON.parse(readFileSync(path, "utf8")) as Passport;
+): Promise<Passport | null> {
+  const row = await prisma.passport.findUnique({
+    where: {
+      tokenId_serialNumber: { tokenId, serialNumber: onChainSerial },
+    },
+  });
+  if (!row) return null;
+  return row.passportJson as unknown as Passport;
 }
 
 export function buildDlPath(tokenId: string, onChainSerial: number): string {

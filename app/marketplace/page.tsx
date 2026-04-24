@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { loadPassport } from "@/lib/passport";
+import { getPassport } from "@/lib/passport";
 import { getRoleFromCookie, roleAccountId } from "@/lib/role";
 import { SectionHeading } from "../_components/SectionHeading";
 import { BuyButton, CancelButton, ListForm } from "./MarketplaceActions";
@@ -62,7 +62,7 @@ async function fetchData(currentAccountId: string) {
 
   const activeListings: ActiveListing[] = [];
   for (const l of active) {
-    const p = loadPassport(l.passport.tokenId, l.passport.serialNumber);
+    const p = await getPassport(l.passport.tokenId, l.passport.serialNumber);
     if (!p) continue;
     const priceHbar = Number(l.priceTinybars) / 1e8;
     activeListings.push({
@@ -80,7 +80,7 @@ async function fetchData(currentAccountId: string) {
 
   const soldRecords: SoldRecord[] = [];
   for (const l of sold) {
-    const p = loadPassport(l.passport.tokenId, l.passport.serialNumber);
+    const p = await getPassport(l.passport.tokenId, l.passport.serialNumber);
     if (!p) continue;
     const priceHbar = Number(l.priceTinybars) / 1e8;
     const resaleEvent = l.passport.events[0];
@@ -97,7 +97,7 @@ async function fetchData(currentAccountId: string) {
 
   const owned: OwnedItem[] = [];
   for (const r of ownedRows) {
-    const p = loadPassport(r.tokenId, r.serialNumber);
+    const p = await getPassport(r.tokenId, r.serialNumber);
     if (!p) continue;
     owned.push({
       tokenId: r.tokenId,

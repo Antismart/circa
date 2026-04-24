@@ -1,0 +1,63 @@
+{
+  "@context": [
+    "https://schema.org",
+    "https://dpp.xyz/contexts/v1"
+  ],
+  "@id": "tier0:hedera-testnet:0.0.8747375/10",
+  "type": [
+    "Product",
+    "DigitalProductPassport"
+  ],
+  "gtin": "STUB-CIRCA-0000003",
+  "serialNumber": "OC-2026-0001",
+  "name": "Nord Ergonomic Task Chair",
+  "category": "furniture/office-chair",
+  "manufacturer": {
+    "name": "Nord Furniture AB",
+    "accountId": "0.0.8747372"
+  },
+  "dateOfManufacture": "2026-01-10",
+  "placeOfManufacture": {
+    "country": "SE",
+    "city": "Malmö"
+  },
+  "public": {
+    "materialComposition": [
+      {
+        "material": "steel-304",
+        "mass_g": 6200,
+        "recycledPercent": 60
+      },
+      {
+        "material": "polyester-mesh",
+        "mass_g": 850,
+        "recycledPercent": 40
+      },
+      {
+        "material": "pu-foam",
+        "mass_g": 1200,
+        "recycledPercent": 10
+      },
+      {
+        "material": "nylon",
+        "mass_g": 480,
+        "recycledPercent": 25
+      }
+    ],
+    "carbonFootprint": {
+      "total_kgCO2e": 42.5,
+      "breakdown": {
+        "materials": 26,
+        "manufacturing": 9.5,
+        "transport": 7
+      }
+    },
+    "repairabilityScore": 6.5,
+    "expectedLifetimeYears": 15
+  },
+  "integrity": {
+    "contentHash": "sha256:0ab962015c84d11145b70fb0f6e424107cb283ccf637765e4825b9a5a903a904",
+    "hederaAnchorTx": "0.0.5776126@1776946470.808527021",
+    "version": 1
+  }
+}

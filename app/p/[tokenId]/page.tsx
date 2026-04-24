@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { loadPassport, type Passport } from "@/lib/passport";
+import { getPassport, type Passport } from "@/lib/passport";
 import { getEventsForToken, type PersistedEvent } from "@/lib/hcs";
 import { prisma } from "@/lib/db";
 import { optionalEnv } from "@/lib/hedera";
@@ -265,7 +265,7 @@ export default async function PassportPage({
   const parsed = parseParam(raw);
   if (!parsed) notFound();
   const { tokenId, serial } = parsed;
-  const passport = loadPassport(tokenId, serial);
+  const passport = await getPassport(tokenId, serial);
   if (!passport) notFound();
 
   const events = await loadEvents(tokenId, serial);

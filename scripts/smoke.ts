@@ -3,8 +3,6 @@ import {
   buildPassport,
   finalizePassport,
   hashPassport,
-  loadPassport,
-  savePassport,
 } from "../lib/passport";
 import { buildNftMetadata, mintPassportNft } from "../lib/hts";
 import { getEventsForToken, submitEvent } from "../lib/hcs";
@@ -55,21 +53,17 @@ async function main(): Promise<void> {
   console.log(`  serial:  ${mint.serial}`);
   console.log(`  txId:    ${mint.txId}`);
 
-  console.log("Step 3: finalize passport with on-chain ids and save to disk");
+  console.log("Step 3: finalize passport with on-chain ids");
   const finalized = finalizePassport(passport, mint.tokenId, mint.serial, mint.txId);
-  const path = savePassport(finalized, mint.tokenId, mint.serial);
-  console.log(`  wrote: ${path}`);
   console.log(`  final hash: ${finalized.integrity.contentHash}`);
 
-  const reloaded = loadPassport(mint.tokenId, mint.serial);
-  if (!reloaded) throw new Error("Round-trip read failed");
-  const rehash = hashPassport(reloaded);
+  const rehash = hashPassport(finalized);
   if (rehash !== finalized.integrity.contentHash) {
     throw new Error(
       `Canonicalization mismatch: wrote ${finalized.integrity.contentHash}, reread ${rehash}`
     );
   }
-  console.log("  round-trip hash matches ✓");
+  console.log("  canonical hash re-computes correctly ✓");
 
   console.log("Step 4: submit mint event to HCS");
   const event = await submitEvent({

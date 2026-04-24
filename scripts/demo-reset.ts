@@ -1,11 +1,6 @@
 import { spawn } from "node:child_process";
-import { existsSync, readdirSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
-import { optionalEnv } from "../lib/hedera";
-
-const PASSPORTS_DIR = join(process.cwd(), "data", "passports");
-const DB_PATH = join(process.cwd(), "prisma", "dev.db");
-const DB_JOURNAL = `${DB_PATH}-journal`;
+import { optionalEnv, requireEnv } from "../lib/hedera";
+import { prisma } from "../lib/db";
 
 function runCmd(cmd: string, args: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -29,30 +24,22 @@ async function main(): Promise<void> {
   }
 
   console.log("── circa · demo reset ──");
-  console.log("Wiping local cache only. HTS collection, HCS topic, and demo accounts persist.\n");
+  console.log("Wiping the Prisma tables only. HTS collection, HCS topic,");
+  console.log("marketplace contract, and demo accounts persist across resets.\n");
 
-  let dbCleared = 0;
-  for (const p of [DB_PATH, DB_JOURNAL]) {
-    if (existsSync(p)) {
-      unlinkSync(p);
-      dbCleared += 1;
-    }
-  }
-  console.log(`SQLite: cleared ${dbCleared} file(s)`);
+  requireEnv("DATABASE_URL");
 
-  let passportsCleared = 0;
-  if (existsSync(PASSPORTS_DIR)) {
-    for (const name of readdirSync(PASSPORTS_DIR)) {
-      if (name.endsWith(".json")) {
-        unlinkSync(join(PASSPORTS_DIR, name));
-        passportsCleared += 1;
-      }
-    }
-  }
-  console.log(`Passport JSON: cleared ${passportsCleared} file(s)`);
+  const [deletedEvents, deletedListings, deletedPassports] =
+    await prisma.$transaction([
+      prisma.event.deleteMany(),
+      prisma.listing.deleteMany(),
+      prisma.passport.deleteMany(),
+    ]);
+  console.log(
+    `Cleared: ${deletedEvents.count} events, ${deletedListings.count} listings, ${deletedPassports.count} passports`
+  );
 
-  console.log("\nRe-pushing Prisma schema...");
-  await runCmd("pnpm", ["exec", "prisma", "db", "push", "--skip-generate"]);
+  await prisma.$disconnect();
 
   console.log("\nRe-seeding 3 demo passports on testnet...");
   await runCmd("pnpm", ["seed"]);
@@ -60,8 +47,13 @@ async function main(): Promise<void> {
   console.log("\n── Reset complete ──");
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error("\nReset failed:");
   console.error(err);
+  try {
+    await prisma.$disconnect();
+  } catch {
+    // ignore
+  }
   process.exit(1);
 });

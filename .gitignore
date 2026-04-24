@@ -26,7 +26,7 @@ dist/
 build/
 *.tsbuildinfo
 
-# Prisma / SQLite
+# Prisma local artefacts (legacy SQLite; harmless to keep)
 prisma/dev.db
 prisma/dev.db-journal
 *.db
@@ -36,9 +36,6 @@ prisma/dev.db-journal
 artifacts/
 cache/
 typechain-types/
-
-# Passport data (regenerable from ledger state)
-data/passports/
 
 # Editor / OS
 .DS_Store

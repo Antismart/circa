@@ -3,9 +3,9 @@ import {
   buildPassport,
   finalizePassport,
   hashPassport,
-  savePassport,
   type BuildPassportInput,
 } from "../lib/passport";
+import type { Prisma } from "@prisma/client";
 import { buildNftMetadata, mintPassportNft } from "../lib/hts";
 import { submitEvent } from "../lib/hcs";
 import { requireEnv } from "../lib/hedera";
@@ -94,8 +94,6 @@ async function seedOne(product: SeedProduct, manufacturerAccountId: string): Pro
   console.log(`  minted ${mint.tokenId}/${mint.serial}  tx=${mint.txId}`);
 
   const finalized = finalizePassport(passport, mint.tokenId, mint.serial, mint.txId);
-  const path = savePassport(finalized, mint.tokenId, mint.serial);
-  console.log(`  wrote ${path}`);
 
   const passportRow = await prisma.passport.create({
     data: {
@@ -105,10 +103,11 @@ async function seedOne(product: SeedProduct, manufacturerAccountId: string): Pro
       ownerAccountId: manufacturerAccountId,
       manufacturerAccountId,
       currentContentHash: finalized.integrity.contentHash,
-      passportJsonPath: path,
+      passportJson: finalized as unknown as Prisma.InputJsonValue,
       mintTxId: mint.txId,
     },
   });
+  console.log(`  row inserted: ${passportRow.id}`);
 
   const mintEvent = await submitEvent({
     type: "mint",

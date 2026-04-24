@@ -5,8 +5,8 @@ import {
   buildPassport,
   finalizePassport,
   hashPassport,
-  savePassport,
 } from "@/lib/passport";
+import type { Prisma } from "@prisma/client";
 import { buildNftMetadata, mintPassportNft } from "@/lib/hts";
 import { submitEvent } from "@/lib/hcs";
 import { prisma } from "@/lib/db";
@@ -119,7 +119,6 @@ export async function POST(req: Request): Promise<NextResponse> {
     const mint = await mintPassportNft(metadata);
 
     const finalized = finalizePassport(passport, mint.tokenId, mint.serial, mint.txId);
-    const path = savePassport(finalized, mint.tokenId, mint.serial);
 
     const passportRow = await prisma.passport.create({
       data: {
@@ -129,7 +128,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         ownerAccountId: manufacturerAccountId,
         manufacturerAccountId,
         currentContentHash: finalized.integrity.contentHash,
-        passportJsonPath: path,
+        passportJson: finalized as unknown as Prisma.InputJsonValue,
         mintTxId: mint.txId,
       },
     });

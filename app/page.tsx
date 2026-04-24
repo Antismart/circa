@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "../lib/db";
-import { loadPassport } from "../lib/passport";
+import { getPassport } from "../lib/passport";
 import { SectionHeading } from "./_components/SectionHeading";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ async function fetchCatalog(): Promise<CatalogItem[]> {
   });
   const items: CatalogItem[] = [];
   for (const row of rows) {
-    const passport = loadPassport(row.tokenId, row.serialNumber);
+    const passport = await getPassport(row.tokenId, row.serialNumber);
     if (!passport) continue;
     items.push({
       tokenId: row.tokenId,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadPassport } from "@/lib/passport";
+import { getPassport } from "@/lib/passport";
 import { getEventsForToken, type PersistedEvent } from "@/lib/hcs";
 import { prisma } from "@/lib/db";
 import { optionalEnv } from "@/lib/hedera";
@@ -53,7 +53,7 @@ export async function GET(
   }
   const { tokenId, serial } = parsed;
 
-  const passport = loadPassport(tokenId, serial);
+  const passport = await getPassport(tokenId, serial);
   if (!passport) {
     return NextResponse.json(
       { error: "passport not found on disk; may need re-seed" },
